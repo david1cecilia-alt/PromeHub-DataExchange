@@ -1,4 +1,4 @@
-package main.java;
+package app;
 
 import ficheros.InfoFicheros;
 
