@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogo>
+    <videojuego id="1">
+        <titulo>Hades</titulo>
+        <plataforma>PC</plataforma>
+        <precio>24.50</precio>
+    </videojuego>
+    <videojuego id="2">
+        <titulo>Celeste</plataforma>
+        <precio>19.99</precio>
+</catalogo>
