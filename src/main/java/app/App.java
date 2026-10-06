@@ -1,8 +1,11 @@
-package main.java;
+package app;
 
 import ficheros.InfoFicheros;
+import modelo.Videojuego;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -18,6 +21,9 @@ public class App {
 
     private static final Scanner teclado = new Scanner(System.in);
 
+    // Catálogo cargado en memoria (se rellena al cargar desde CSV o desde XML)
+    private static List<Videojuego> catalogo = new ArrayList<>();
+
     public static void main(String[] args) {
         int opcion;
 
@@ -27,11 +33,11 @@ public class App {
 
             switch (opcion) {
                 case 1 -> pendiente("Cargar catálogo desde CSV");
-                case 2 -> pendiente("Mostrar catálogo");
+                case 2 -> mostrarCatalogo();
                 case 3 -> pendiente("Exportar catálogo a XML");
                 case 4 -> pendiente("Cargar catálogo desde XML");
                 case 5 -> pendiente("Exportar catálogo a CSV");
-                case 6 -> pendiente("Buscar videojuego");
+                case 6 -> buscarVideojuego();
                 case 7 -> mostrarInfoFicheros();
                 case 0 -> System.out.println("Saliendo de PromeHub Data Exchange. ¡Hasta pronto!");
                 case -1 -> { } // Ya se mostró el error en leerOpcion()
@@ -71,6 +77,83 @@ public class App {
         } catch (NumberFormatException e) {
             System.out.println("Error: \"" + entrada + "\" no es una opción válida. Escribe un número del 0 al 7.");
             return -1;
+        }
+    }
+
+    /** RF2: muestra todos los videojuegos cargados en memoria. */
+    private static void mostrarCatalogo() {
+        if (catalogo.isEmpty()) {
+            System.out.println("El catálogo está vacío. Carga primero un CSV (opción 1) o un XML (opción 4).");
+            return;
+        }
+
+        System.out.println("\n--- Catálogo de videojuegos (" + catalogo.size() + ") ---");
+        for (Videojuego juego : catalogo) {
+            System.out.println(juego);
+        }
+    }
+
+    /** RF6: busca un videojuego por su id o por su título. */
+    private static void buscarVideojuego() {
+        if (catalogo.isEmpty()) {
+            System.out.println("El catálogo está vacío. Carga primero un CSV (opción 1) o un XML (opción 4).");
+            return;
+        }
+
+        System.out.print("¿Buscar por (1) id o (2) título? ");
+        String tipo = teclado.nextLine().trim();
+
+        switch (tipo) {
+            case "1" -> buscarPorId();
+            case "2" -> buscarPorTitulo();
+            default -> System.out.println("Error: escribe 1 para buscar por id o 2 para buscar por título.");
+        }
+    }
+
+    /** Busca el videojuego con el id exacto que escriba el usuario. */
+    private static void buscarPorId() {
+        System.out.print("Escribe el id: ");
+        String entrada = teclado.nextLine().trim();
+
+        int idBuscado;
+        try {
+            idBuscado = Integer.parseInt(entrada);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: \"" + entrada + "\" no es un id válido. El id debe ser un número.");
+            return;
+        }
+
+        for (Videojuego juego : catalogo) {
+            if (juego.getId() == idBuscado) {
+                System.out.println("Encontrado: " + juego);
+                return;
+            }
+        }
+        System.out.println("No hay ningún videojuego con el id " + idBuscado + ".");
+    }
+
+    /** Busca los videojuegos cuyo título contenga el texto escrito (sin distinguir mayúsculas). */
+    private static void buscarPorTitulo() {
+        System.out.print("Escribe el título o parte de él: ");
+        String texto = teclado.nextLine().trim().toLowerCase();
+
+        if (texto.isEmpty()) {
+            System.out.println("Error: el texto de búsqueda no puede estar vacío.");
+            return;
+        }
+
+        int encontrados = 0;
+        for (Videojuego juego : catalogo) {
+            if (juego.getTitulo().toLowerCase().contains(texto)) {
+                System.out.println(juego);
+                encontrados++;
+            }
+        }
+
+        if (encontrados == 0) {
+            System.out.println("No hay ningún videojuego cuyo título contenga \"" + texto + "\".");
+        } else {
+            System.out.println("Resultados encontrados: " + encontrados);
         }
     }
 
