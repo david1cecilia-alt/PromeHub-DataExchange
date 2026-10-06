@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogo>
+    <videojuego>
+        <id>1</id>
+        <titulo>Cyberpunk 2077</titulo>
+        <plataforma>PC</plataforma>
+        <genero>RPG</genero>
+        <precio>39.99</precio>
+        <stock>12</stock>
+        <codigoProveedor>PROV-001</codigoProveedor>
+    </videojuego>
+    <videojuego>
+        <id>2</id>
+        <titulo>Minecraft</plataforma>
+        <precio>29.99</precio>
+</catalogo>
