@@ -1,0 +1,5 @@
+{
+    "java.import.maven.enabled": true,
+    "java.project.sourcePaths": ["src/main/java"],
+    "java.configuration.updateBuildConfiguration": "automatic"
+}
