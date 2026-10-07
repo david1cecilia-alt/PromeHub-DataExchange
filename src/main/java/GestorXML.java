@@ -1,7 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
+import modelo.Videojuego;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
