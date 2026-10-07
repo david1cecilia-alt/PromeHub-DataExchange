@@ -1,11 +1,7 @@
+```java
 package promehub;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +10,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
-public class CatalogoService {
+public class GestorXML {
 
     private List<Videojuego> videojuegos;
 
@@ -28,107 +24,8 @@ public class CatalogoService {
         return videojuegos;
     }
 
-
     // =====================================================
-    // 1. CARGAR CSV
-    // CSV -> JAVA
-    // =====================================================
-
-    public int cargarDesdeCSV(String nombreFichero) throws IOException {
-
-        videojuegos.clear();
-
-        File fichero = new File(nombreFichero);
-
-        // Comprobar si existe
-        if (!fichero.exists()) {
-            throw new IOException("El fichero CSV no existe.");
-        }
-
-        int registros = 0;
-
-        // Lectura secuencial
-        try (BufferedReader br =
-                     new BufferedReader(new FileReader(fichero))) {
-
-            // Leer y saltar la cabecera
-            String linea = br.readLine();
-
-            // Leer línea por línea
-            while ((linea = br.readLine()) != null) {
-
-                // Ignorar líneas vacías
-                if (linea.trim().isEmpty()) {
-                    continue;
-                }
-
-                try {
-
-                    // Separar los datos por comas
-                    String[] datos = linea.split(",");
-
-                    // Un videojuego debe tener 7 datos
-                    if (datos.length != 7) {
-
-                        System.out.println(
-                                "[ERROR] Registro CSV incorrecto: "
-                                        + linea
-                        );
-
-                        continue;
-                    }
-
-                    // Convertir los datos
-                    int id = Integer.parseInt(datos[0].trim());
-
-                    String titulo = datos[1].trim();
-
-                    String plataforma = datos[2].trim();
-
-                    String genero = datos[3].trim();
-
-                    double precio =
-                            Double.parseDouble(datos[4].trim());
-
-                    int stock =
-                            Integer.parseInt(datos[5].trim());
-
-                    String codigoProveedor =
-                            datos[6].trim();
-
-                    // Crear el objeto
-                    Videojuego videojuego =
-                            new Videojuego(
-                                    id,
-                                    titulo,
-                                    plataforma,
-                                    genero,
-                                    precio,
-                                    stock,
-                                    codigoProveedor
-                            );
-
-                    // Añadirlo a la colección
-                    videojuegos.add(videojuego);
-
-                    registros++;
-
-                } catch (NumberFormatException e) {
-
-                    System.out.println(
-                            "[ERROR] Error numérico en el registro: "
-                                    + linea
-                    );
-                }
-            }
-        }
-
-        return registros;
-    }
-
-
-    // =====================================================
-    // 2. EXPORTAR XML
+    // 1. EXPORTAR XML
     // JAVA -> XML
     // =====================================================
 
@@ -160,9 +57,8 @@ public class CatalogoService {
         );
     }
 
-
     // =====================================================
-    // 3. CARGAR XML
+    // 2. CARGAR XML
     // XML -> JAVA
     // =====================================================
 
@@ -190,43 +86,8 @@ public class CatalogoService {
         return videojuegos.size();
     }
 
-
     // =====================================================
-    // 4. EXPORTAR CSV
-    // JAVA -> CSV
-    // =====================================================
-
-    public void exportarCSV(String nombreFichero)
-            throws IOException {
-
-        try (PrintWriter writer =
-                     new PrintWriter(
-                             new FileWriter(nombreFichero))) {
-
-            // Cabecera
-            writer.println(
-                    "id,titulo,plataforma,genero,precio,stock,codigoProveedor"
-            );
-
-            // Escribir cada videojuego
-            for (Videojuego videojuego : videojuegos) {
-
-                writer.println(
-                        videojuego.getId() + ","
-                                + videojuego.getTitulo() + ","
-                                + videojuego.getPlataforma() + ","
-                                + videojuego.getGenero() + ","
-                                + videojuego.getPrecio() + ","
-                                + videojuego.getStock() + ","
-                                + videojuego.getCodigoProveedor()
-                );
-            }
-        }
-    }
-
-
-    // =====================================================
-    // 5. BUSCAR POR ID
+    // 3. BUSCAR POR ID
     // =====================================================
 
     public Videojuego buscarPorId(int id) {
@@ -241,9 +102,8 @@ public class CatalogoService {
         return null;
     }
 
-
     // =====================================================
-    // 6. BUSCAR POR TÍTULO
+    // 4. BUSCAR POR TÍTULO
     // =====================================================
 
     public List<Videojuego> buscarPorTitulo(String titulo) {
@@ -264,3 +124,4 @@ public class CatalogoService {
         return resultados;
     }
 }
+```
