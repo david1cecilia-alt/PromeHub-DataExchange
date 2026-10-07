@@ -1,8 +1,11 @@
 package app;
 
+import ficheros.GestorCSV;
 import ficheros.InfoFicheros;
 import modelo.Videojuego;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +35,11 @@ public class App {
             opcion = leerOpcion();
 
             switch (opcion) {
-                case 1 -> pendiente("Cargar catálogo desde CSV");
+                case 1 -> cargarDesdeCSV();
                 case 2 -> mostrarCatalogo();
                 case 3 -> pendiente("Exportar catálogo a XML");
                 case 4 -> pendiente("Cargar catálogo desde XML");
-                case 5 -> pendiente("Exportar catálogo a CSV");
+                case 5 -> exportarACSV();
                 case 6 -> buscarVideojuego();
                 case 7 -> mostrarInfoFicheros();
                 case 0 -> System.out.println("Saliendo de PromeHub Data Exchange. ¡Hasta pronto!");
@@ -77,6 +80,38 @@ public class App {
         } catch (NumberFormatException e) {
             System.out.println("Error: \"" + entrada + "\" no es una opción válida. Escribe un número del 0 al 7.");
             return -1;
+        }
+    }
+
+    /** RF1: carga el catálogo desde el CSV. */
+    private static void cargarDesdeCSV() {
+        try {
+            catalogo = GestorCSV.leer(RUTA_CSV);
+
+            if (catalogo.isEmpty()) {
+                System.out.println("Aviso: el fichero no contiene ningún videojuego válido.");
+            } else {
+                System.out.println("Catálogo cargado desde " + RUTA_CSV.getFileName() + ".");
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: no se puede cargar el catálogo. " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error al leer el fichero CSV: " + e.getMessage());
+        }
+    }
+
+    /** RF5: exporta el catálogo que haya en memoria a un CSV nuevo. */
+    private static void exportarACSV() {
+        if (catalogo.isEmpty()) {
+            System.out.println("El catálogo está vacío. Carga primero un CSV (opción 1) o un XML (opción 4).");
+            return;
+        }
+
+        try {
+            GestorCSV.escribir(catalogo, RUTA_CSV_EXPORTADO);
+            System.out.println("Catálogo exportado a " + RUTA_CSV_EXPORTADO + " (" + catalogo.size() + " videojuegos).");
+        } catch (IOException e) {
+            System.out.println("Error al escribir el fichero CSV: " + e.getMessage());
         }
     }
 
