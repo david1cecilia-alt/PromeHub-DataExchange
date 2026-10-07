@@ -1,11 +1,11 @@
-id;titulo;plataforma;genero;año;precio
-1;Hades;PC;Roguelike;2020;24,50
-2;;PC;Accion;2019;10,00
-abc;Juego con id texto;PS5;Aventura;2021;30,00
-4;Precio negativo;PC;Puzzle;2020;-5,00
-5;Precio texto;PC;Puzzle;2020;gratis
-6;Faltan campos;PC
-7;Demasiados campos;PC;Accion;2020;10,00;extra;otro
-1;Id duplicado;Switch;Accion;2020;15,00
-9;Anio texto;PC;Accion;veinte;12,00
-10;Valido final;PS5;Aventura;2023;49,99
+id,titulo,plataforma,genero,precio,stock,codigoProveedor
+1,Hades,PC,Roguelike,24.50,10,PROV-005
+2,,PC,Accion,10.00,5,PROV-001
+abc,Juego con id texto,PS5,Aventura,30.00,3,PROV-002
+4,Precio negativo,PC,Puzzle,-5.00,7,PROV-003
+5,Precio texto,PC,Puzzle,gratis,7,PROV-003
+6,Faltan campos,PC
+7,Demasiados campos,PC,Accion,10.00,4,PROV-001,extra
+1,Id duplicado,Switch,Accion,15.00,2,PROV-004
+9,Stock texto,PC,Accion,12.00,muchos,PROV-002
+10,Valido final,PS5,Aventura,49.99,9,PROV-001
