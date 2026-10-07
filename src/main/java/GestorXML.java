@@ -12,7 +12,7 @@ public class GestorXML {
     private List<Videojuego> videojuegos;
 
     // Constructor
-    public CatalogoService() {
+    public GestorXML() {
         videojuegos = new ArrayList<>();
     }
 
