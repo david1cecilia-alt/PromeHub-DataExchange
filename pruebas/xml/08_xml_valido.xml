@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<catalogo>
+    <videojuego id="1">
+        <titulo>Cyberpunk 2077</titulo>
+        <plataforma>PC</plataforma>
+        <genero>RPG</genero>
+        <precio>39.99</precio>
+        <stock>12</stock>
+    </videojuego>
+    <videojuego id="2">
+        <titulo>Minecraft</titulo>
+        <plataforma>PC</plataforma>
+        <genero>Sandbox</genero>
+        <precio>29.99</precio>
+        <stock>20</stock>
+    </videojuego>
+</catalogo>
