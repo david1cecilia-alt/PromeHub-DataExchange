@@ -1,9 +1,6 @@
 # PromeHub-DataExchange
 Tenemos 7 días para entregar una aplicación Java de consola que convierte el catálogo de videojuegos CSV → Java → XML y XML → Java → CSV usando JAXB. La entrega es el jueves 8/10/2026 a las 10:20.
 
-# PromeHub-DataExchange
-Tenemos 7 días para entregar una aplicación Java de consola que convierte el catálogo de videojuegos CSV → Java → XML y XML → Java → CSV usando JAXB. La entrega es el jueves 8/10/2026 a las 10:20.
-
 # PromeHub Data Exchange
 
 Aplicación Java de consola que hace de intermediaria entre **PHManager**, que trabaja con CSV, y **PHStore**, que trabaja con XML. Convierte el catálogo de videojuegos en los dos sentidos:
