@@ -1,6 +1,9 @@
+package ficheros;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import modelo.Catalogo;
 import modelo.Videojuego;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -121,4 +124,4 @@ public class GestorXML {
         return resultados;
     }
 }
-```
+
