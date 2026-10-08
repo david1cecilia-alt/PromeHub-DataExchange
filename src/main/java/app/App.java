@@ -1,15 +1,26 @@
 package app;
 
-import ficheros.GestorCSV;
-import ficheros.InfoFicheros;
-import modelo.Videojuego;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
+import ficheros.GestorCSV;
+import ficheros.InfoFicheros;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import modelo.Videojuego;
 
 /**
  * Clase principal de PromeHub Data Exchange.
@@ -37,8 +48,8 @@ public class App {
             switch (opcion) {
                 case 1 -> cargarDesdeCSV();
                 case 2 -> mostrarCatalogo();
-                case 3 -> pendiente("Exportar catálogo a XML");
-                case 4 -> pendiente("Cargar catálogo desde XML");
+                case 3 -> exportarAXML();
+                case 4 -> cargarDesdeXML();
                 case 5 -> exportarACSV();
                 case 6 -> buscarVideojuego();
                 case 7 -> mostrarInfoFicheros();
@@ -98,6 +109,88 @@ public class App {
         } catch (IOException e) {
             System.out.println("Error al leer el fichero CSV: " + e.getMessage());
         }
+    }
+
+    /** RF3: exporta el catálogo que haya en memoria a XML. */
+    private static void exportarAXML() {
+        if (catalogo.isEmpty()) {
+            System.out.println("El catálogo está vacío. Carga primero un CSV (opción 1) o un XML (opción 4).");
+            return;
+        }
+
+        try {
+            CatalogoXML datosXML = new CatalogoXML(catalogo);
+
+            JAXBContext contexto = JAXBContext.newInstance(CatalogoXML.class);
+            Marshaller marshaller = contexto.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            marshaller.marshal(datosXML, RUTA_XML.toFile());
+
+            System.out.println("Catálogo exportado a " + RUTA_XML + " (" + catalogo.size() + " videojuegos).");
+        } catch (JAXBException e) {
+            System.out.println("Error al exportar el catálogo a XML: " + e.getMessage());
+        }
+    }
+
+    /** RF4: carga el catálogo desde el XML. */
+    private static void cargarDesdeXML() {
+        if (!Files.exists(RUTA_XML)) {
+            System.out.println("Error: no se puede cargar el catálogo. El fichero " + RUTA_XML + " no existe.");
+            return;
+        }
+
+        try {
+            JAXBContext contexto = JAXBContext.newInstance(CatalogoXML.class);
+            Unmarshaller unmarshaller = contexto.createUnmarshaller();
+
+            CatalogoXML datosXML = (CatalogoXML) unmarshaller.unmarshal(RUTA_XML.toFile());
+
+            List<Videojuego> juegosCargados = datosXML.getVideojuegos();
+
+            if (!catalogoXMLValido(juegosCargados)) {
+                System.out.println("Error: el XML contiene datos de videojuegos no válidos.");
+                return;
+            }
+
+            catalogo = juegosCargados;
+
+            if (catalogo.isEmpty()) {
+                System.out.println("Aviso: el fichero XML no contiene ningún videojuego.");
+            } else {
+                System.out.println("Catálogo cargado desde " + RUTA_XML + ".");
+                System.out.println("Videojuegos cargados: " + catalogo.size());
+            }
+        } catch (JAXBException e) {
+            System.out.println("Error al leer el fichero XML: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Comprueba los datos que JAXB ha cargado desde XML.
+     * Se hace aquí para no modificar las clases del modelo ni otros ficheros del proyecto.
+     */
+    private static boolean catalogoXMLValido(List<Videojuego> juegos) {
+        if (juegos == null) {
+            return false;
+        }
+
+        Set<Integer> ids = new HashSet<>();
+
+        for (Videojuego juego : juegos) {
+            if (juego == null
+                    || juego.getTitulo() == null
+                    || juego.getTitulo().isBlank()
+                    || juego.getPlataforma() == null
+                    || juego.getGenero() == null
+                    || juego.getPrecio() < 0
+                    || juego.getStock() < 0
+                    || !ids.add(juego.getId())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /** RF5: exporta el catálogo que haya en memoria a un CSV nuevo. */
@@ -200,8 +293,31 @@ public class App {
         InfoFicheros.mostrarInfo(RUTA_CSV_EXPORTADO);
     }
 
-    /** Aviso temporal para las opciones que dependen de las clases que aún no están en el repositorio. */
-    private static void pendiente(String nombreOpcion) {
-        System.out.println("La opción \"" + nombreOpcion + "\" todavía no está implementada.");
+    /**
+     * Clase auxiliar para que JAXB pueda representar el catálogo.
+     * Está dentro de App para cumplir la condición de modificar únicamente la app.
+     */
+    @XmlRootElement(name = "catalogo")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class CatalogoXML {
+
+        @XmlElement(name = "videojuego")
+        private List<Videojuego> videojuegos;
+
+        public CatalogoXML() {
+            videojuegos = new ArrayList<>();
+        }
+
+        public CatalogoXML(List<Videojuego> videojuegos) {
+            this.videojuegos = videojuegos;
+        }
+
+        public List<Videojuego> getVideojuegos() {
+            return videojuegos;
+        }
+
+        public void setVideojuegos(List<Videojuego> videojuegos) {
+            this.videojuegos = videojuegos;
+        }
     }
 }
