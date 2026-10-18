@@ -108,7 +108,7 @@ public class Videojuego {
                 + " | Plataforma: " + plataforma
                 + " | Género: " + genero
                 + " | Precio: " + precio
-                + " € | Stock: " + stock
+                + " EUR | Stock: " + stock
                 + " | Código proveedor: " + codigoProveedor;
     }
 }

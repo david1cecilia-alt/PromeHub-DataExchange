@@ -24,6 +24,13 @@ public class GestorXML {
         return videojuegos;
     }
 
+    // Recibe la lista que se va a exportar.
+    // Corrección: sin este método no había forma de pasarle el catálogo
+    // y exportarXML() siempre exportaba una lista vacía.
+    public void setVideojuegos(List<Videojuego> videojuegos) {
+        this.videojuegos = videojuegos;
+    }
+
     // =====================================================
     // 1. EXPORTAR XML
     // JAVA -> XML
@@ -72,6 +79,12 @@ public class GestorXML {
         // Crear Unmarshaller
         Unmarshaller unmarshaller =
                 context.createUnmarshaller();
+
+        // Corrección: por defecto JAXB ignora los datos que no puede convertir
+        // (por ejemplo <precio>gratis</precio>) y deja el valor a 0.
+        // Devolviendo false, cualquier error de conversión detiene la lectura
+        // y lanza una JAXBException que se gestiona en App.
+        unmarshaller.setEventHandler(evento -> false);
 
         // Leer el XML
         Catalogo catalogo =
