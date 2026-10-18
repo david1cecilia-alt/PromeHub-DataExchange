@@ -11,15 +11,9 @@ import java.util.Scanner;
 import java.util.Set;
 
 import ficheros.GestorCSV;
+import ficheros.GestorXML;
 import ficheros.InfoFicheros;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 import modelo.Videojuego;
 
 /**
@@ -34,6 +28,10 @@ public class App {
     private static final Path RUTA_CSV_EXPORTADO = Path.of("datos", "catalogo_exportado.csv");
 
     private static final Scanner teclado = new Scanner(System.in);
+
+    // Valor que devuelve leerOpcion() cuando lo escrito no es un número.
+    // Corrección: antes se usaba -1, y si el usuario escribía -1 el menú no mostraba ningún error.
+    private static final int OPCION_NO_NUMERICA = Integer.MIN_VALUE;
 
     // Catálogo cargado en memoria (se rellena al cargar desde CSV o desde XML)
     private static List<Videojuego> catalogo = new ArrayList<>();
@@ -54,7 +52,7 @@ public class App {
                 case 6 -> buscarVideojuego();
                 case 7 -> mostrarInfoFicheros();
                 case 0 -> System.out.println("Saliendo de PromeHub Data Exchange. ¡Hasta pronto!");
-                case -1 -> { } // Ya se mostró el error en leerOpcion()
+                case OPCION_NO_NUMERICA -> { } // Ya se mostró el error en leerOpcion()
                 default -> System.out.println("Error: la opción " + opcion + " no existe. Elige un número del 0 al 7.");
             }
         } while (opcion != 0);
@@ -81,7 +79,7 @@ public class App {
 
     /**
      * Lee la opción escrita por el usuario.
-     * Si no es un número, avisa del error y devuelve -1 para que el menú se repita.
+     * Si no es un número, avisa del error y devuelve OPCION_NO_NUMERICA para que el menú se repita.
      */
     private static int leerOpcion() {
         String entrada = teclado.nextLine().trim();
@@ -90,7 +88,7 @@ public class App {
             return Integer.parseInt(entrada);
         } catch (NumberFormatException e) {
             System.out.println("Error: \"" + entrada + "\" no es una opción válida. Escribe un número del 0 al 7.");
-            return -1;
+            return OPCION_NO_NUMERICA;
         }
     }
 
@@ -119,13 +117,10 @@ public class App {
         }
 
         try {
-            CatalogoXML datosXML = new CatalogoXML(catalogo);
-
-            JAXBContext contexto = JAXBContext.newInstance(CatalogoXML.class);
-            Marshaller marshaller = contexto.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            marshaller.marshal(datosXML, RUTA_XML.toFile());
+            // Corrección: se usa GestorXML en lugar de repetir aquí el código de JAXB
+            GestorXML gestorXML = new GestorXML();
+            gestorXML.setVideojuegos(catalogo);
+            gestorXML.exportarXML(RUTA_XML.toString());
 
             System.out.println("Catálogo exportado a " + RUTA_XML + " (" + catalogo.size() + " videojuegos).");
         } catch (JAXBException e) {
@@ -141,12 +136,11 @@ public class App {
         }
 
         try {
-            JAXBContext contexto = JAXBContext.newInstance(CatalogoXML.class);
-            Unmarshaller unmarshaller = contexto.createUnmarshaller();
+            // Corrección: se usa GestorXML en lugar de repetir aquí el código de JAXB
+            GestorXML gestorXML = new GestorXML();
+            gestorXML.cargarDesdeXML(RUTA_XML.toString());
 
-            CatalogoXML datosXML = (CatalogoXML) unmarshaller.unmarshal(RUTA_XML.toFile());
-
-            List<Videojuego> juegosCargados = datosXML.getVideojuegos();
+            List<Videojuego> juegosCargados = gestorXML.getVideojuegos();
 
             if (!catalogoXMLValido(juegosCargados)) {
                 System.out.println("Error: el XML contiene datos de videojuegos no válidos.");
@@ -162,7 +156,10 @@ public class App {
                 System.out.println("Videojuegos cargados: " + catalogo.size());
             }
         } catch (JAXBException e) {
-            System.out.println("Error al leer el fichero XML: " + e.getMessage());
+            // Corrección: e.getMessage() puede ser null (XML vacío o mal formado),
+            // así que se muestra un mensaje propio que explica el problema.
+            System.out.println("Error al leer el fichero XML: está vacío, mal formado, no es un catálogo"
+                    + " o contiene datos con un formato incorrecto (por ejemplo, texto en el precio).");
         }
     }
 
@@ -291,33 +288,5 @@ public class App {
         InfoFicheros.mostrarInfo(RUTA_CSV);
         InfoFicheros.mostrarInfo(RUTA_XML);
         InfoFicheros.mostrarInfo(RUTA_CSV_EXPORTADO);
-    }
-
-    /**
-     * Clase auxiliar para que JAXB pueda representar el catálogo.
-     * Está dentro de App para cumplir la condición de modificar únicamente la app.
-     */
-    @XmlRootElement(name = "catalogo")
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class CatalogoXML {
-
-        @XmlElement(name = "videojuego")
-        private List<Videojuego> videojuegos;
-
-        public CatalogoXML() {
-            videojuegos = new ArrayList<>();
-        }
-
-        public CatalogoXML(List<Videojuego> videojuegos) {
-            this.videojuegos = videojuegos;
-        }
-
-        public List<Videojuego> getVideojuegos() {
-            return videojuegos;
-        }
-
-        public void setVideojuegos(List<Videojuego> videojuegos) {
-            this.videojuegos = videojuegos;
-        }
     }
 }
